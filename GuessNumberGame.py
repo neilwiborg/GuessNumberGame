@@ -1,7 +1,14 @@
 import random
+import re
+
+def printWelcome() -> None:
+	print("==============================================================")
+	print("Welcome to the Guess a Number Game!")
 
 def parseRangeInput(rangeInput: str) -> list[int]:
 	type = ""
+	# TODO allow no brackets around
+	# TODO allow negative numbers
 	if rangeInput[0] == '(' and rangeInput[-1] == ')':
 		type = "exclusive"
 	elif rangeInput[0] == '[' and rangeInput[-1] == ']':
@@ -10,7 +17,9 @@ def parseRangeInput(rangeInput: str) -> list[int]:
 		return []
 	
 	rangeInput = rangeInput[1:-1].replace(" ", "")
-	# TODO check to make sure all characters are 0-9 or , (no letters/symbols)
+	invalid_characters = re.compile(r"[^0-9,]")
+	if invalid_characters.search(rangeInput):
+		return []
 	numbers = [int(x) for x in rangeInput.split(",")]
 	if len(numbers) != 2:
 		return []
@@ -24,18 +33,38 @@ def parseRangeInput(rangeInput: str) -> list[int]:
 	
 	return numbers
 
-def main():
-	print("==============================================================")
-	print("Welcome to the Guess a Number Game!")
+def getRange() -> list[int]:
 	numbers = []
 	while (len(numbers) == 0):
 		range = input("Enter range: ")
 		numbers = parseRangeInput(range)
 		if len(numbers) == 0:
 			print("Invalid input! Please try again.")
+	return numbers
+
+def getAttempts() -> int:
+	attempts = 0
+	while attempts < 1:
+		attempts = input("Enter number of attempts to allow: ")
+		# TODO check if negative number{20,30}
+		if attempts.isdigit():
+			attempts = int(attempts)
+			if (attempts  < 1):
+				print("Invalid number of attempts!")
+		else:
+			attempts = 0
+			print("Invalid input!")
+	return attempts
+
+def printEnding(remainingAttempts: int, secretNumber: int) -> None:
+	if (remainingAttempts > 0):
+		print("Good guess! Hope your luck continues next time!")
+	else:
+		print("Too bad, the correct answer was " + str(secretNumber) + ". Try again next time!")
+
+def runGame(numbers: list[int], attempts: int) -> None:
 	secretNumber = random.randint(numbers[0], numbers[1])
-	# TODO check if input is number
-	attempts = int(input("Enter number of attempts to allow: "))
+
 	while (attempts > 0):
 		# TODO check if input is number
 		guess = int(input("Enter your guess: "))
@@ -43,11 +72,17 @@ def main():
 			print("CORRECT!!!")
 			break
 		print("WRONG!")
+		if (guess < secretNumber):
+			print("Try higher....")
+		else:
+			print("Try lower...")
 		attempts -= 1
-	if (attempts > 0):
-		print("Good guess! Hope your luck continues next time!")
-	else:
-		print("Too bad, the correct answer was " + str(secretNumber) + ". Try again next time!")
 
+	printEnding(attempts, secretNumber)	
+
+def main():
+	printWelcome()
+	runGame(getRange(), getAttempts())
+		
 if __name__ == "__main__" :
 	main()
