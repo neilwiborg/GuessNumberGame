@@ -72,11 +72,11 @@ def runGame(numbers: list[int], attempts: int) -> None:
 			print("CORRECT!!!")
 			break
 		print("WRONG!")
-		if (guess < secretNumber):
-			print("Try higher....")
-		else:
-			print("Try lower...")
 		attempts -= 1
+		if (guess < secretNumber and attempts > 0):
+			print("Try higher....")
+		elif (guess > secretNumber and attempts > 0):
+			print("Try lower...")
 
 	printEnding(attempts, secretNumber)	
 
